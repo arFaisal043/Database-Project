@@ -134,14 +134,50 @@ INNER JOIN
 	courses AS c ON e.course_id = c.course_id;
 
 
+-- Ques 11: Display all students and their enrolled courses. Include students who have not enrolled in any course using a LEFT JOIN.
+SELECT 
+	s.student_id, 
+	CONCAT(s.first_name, ' ', s.last_name) AS full_name, 
+	COALESCE(c.course_title, 'NOT ENROLLED') AS Course_Title, 
+	e.enrollment_date
+FROM students AS s
+LEFT JOIN 
+	enrollments AS e ON s.student_id = e.student_id
+LEFT JOIN courses AS c ON e.course_id = c.course_id
+ORDER BY student_id;
 
-### Ques 11: Display all students and their enrolled courses. Include students who have not enrolled in any course using a LEFT JOIN.
 
-### Ques 12: Display all courses and their enrolled students. Include courses that have no enrollments using a RIGHT JOIN.
+-- Ques 12: Display all courses and their enrolled students. Include courses that have no enrollments using a RIGHT JOIN.
+SELECT 
+	s.student_id, c.course_id, COALESCE(c.course_title, 'NOT ENROLLED') AS Course_Tiltle
+FROM courses AS c
+RIGHT JOIN 
+	enrollments AS e ON c.course_id = e.course_id
+RIGHT JOIN 
+	students AS s ON e.student_id = s.student_id
 
-### Ques 13: Display all students and all courses, even if there is no matching enrollment, using a FULL JOIN.
 
-### Ques 14: Show the number of enrollments per year based on enrollment_date.
+-- Ques 13: Display all students and all courses, even if there is no matching enrollment, using a FULL JOIN.
+SELECT 
+    s.student_id,
+    CONCAT(s.first_name, ' ', s.last_name) AS full_name,
+    c.course_id,
+    c.course_title,
+    e.enrollment_id,
+    e.enrollment_date,
+    e.progress_percentage,
+    e.paid_amount
+FROM students s
+FULL JOIN 
+	enrollments e ON s.student_id = e.student_id
+FULL JOIN 
+	courses c ON e.course_id = c.course_id
 
-### Ques 15: Find the average progress percentage per course, ignoring NULL values.
 
+-- Ques 14: Show the number of enrollments per year based on enrollment_date.
+SELECT 
+    EXTRACT(YEAR FROM enrollment_date) AS enrollment_year,
+    COUNT(*) AS number_of_enrollments
+FROM enrollments
+GROUP BY EXTRACT(YEAR FROM enrollment_date)
+ORDER BY enrollment_year;

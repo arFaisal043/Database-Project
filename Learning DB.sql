@@ -131,5 +131,112 @@ CROSS JOIN users as u;
 
 -- Natural Join
 select * from posts
-natural join users;
+natural join
+
+
+
+-- _________ Create Table for practicing Sub Query ______________________________
+
+create table employees(
+	id serial primary key,
+	name varchar(50),
+	dept varchar(50),
+	salary int
+)
+
+INSERT INTO employees (name, dept, salary) VALUES
+-- IT Department (10 employees)
+('Alice Johnson', 'IT', 75000),
+('Bob Smith', 'IT', 82000),
+('Carol White', 'IT', 91000),
+('David Brown', 'IT', 68000),
+('Eva Martinez', 'IT', 72000),
+('Frank Wilson', 'IT', 85000),
+('Grace Lee', 'IT', 79000),
+('Henry Davis', 'IT', 94000),
+('Ivy Taylor', 'IT', 67000),
+('Jack Anderson', 'IT', 88000),
+
+-- HR Department (8 employees)
+('Karen Thomas', 'HR', 62000),
+('Leo Garcia', 'HR', 58000),
+('Mia Robinson', 'HR', 65000),
+('Noah Clark', 'HR', 54000),
+('Olivia Rodriguez', 'HR', 67000),
+('Peter Lewis', 'HR', 61000),
+('Quinn Walker', 'HR', 59000),
+('Rachel Hall', 'HR', 63000),
+
+-- Finance Department (9 employees)
+('Sam Allen', 'Finance', 78000),
+('Tina Young', 'Finance', 81000),
+('Umar Hernandez', 'Finance', 73000),
+('Vera King', 'Finance', 69000),
+('Will Wright', 'Finance', 84000),
+('Xena Lopez', 'Finance', 76000),
+('Yusuf Hill', 'Finance', 71000),
+('Zara Scott', 'Finance', 79000),
+('Adam Green', 'Finance', 82000),
+
+-- Marketing Department (9 employees)
+('Betty Adams', 'Marketing', 64000),
+('Carl Baker', 'Marketing', 71000),
+('Diana Nelson', 'Marketing', 68000),
+('Ethan Carter', 'Marketing', 59000),
+('Fiona Mitchell', 'Marketing', 66000),
+('George Perez', 'Marketing', 70000),
+('Hannah Roberts', 'Marketing', 63000),
+('Ian Turner', 'Marketing', 72000),
+('Julia Phillips', 'Marketing', 67000),
+
+-- Sales Department (8 employees)
+('Kevin Campbell', 'Sales', 88000),
+('Laura Evans', 'Sales', 92000),
+('Mike Edwards', 'Sales', 85000),
+('Nina Collins', 'Sales', 79000),
+('Oscar Stewart', 'Sales', 81000),
+('Patricia Morris', 'Sales', 76000),
+('Randy Murphy', 'Sales', 84000),
+('Sandra Cook', 'Sales', 89000),
+
+-- Operations Department (6 employees)
+('Tom Rogers', 'Operations', 69000),
+('Uma Peterson', 'Operations', 72000),
+('Victor Cooper', 'Operations', 67000),
+('Wendy Reed', 'Operations', 74000),
+('Xavier Bailey', 'Operations', 71000),
+('Yvonne Bell', 'Operations', 68000);
+
+
+select * from employees
+
+
+-- q1: find the highest salarys
+select max(salary) from employees;
+
+
+-- q2: find which employee gets the highest salary
+select * from employees
+where salary = (select max(salary) from employees);
+
+
+-- q3: find which employee gets more than the average salary
+select * from employees
+where salary > (select avg(salary) from employees);
+
+
+-- q4: find which employee gets the highest salary in HR dept
+select * from employees
+where dept = 'HR' and salary = (
+	select max(salary) from employees
+	where dept = 'HR'
+);
+
+
+
+
+
+
+
+
 

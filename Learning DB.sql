@@ -237,6 +237,45 @@ where dept = 'HR' and salary = (
 
 
 
+-- --------- Function in sql --------------------------------------
+
+
+-- CREATE A FUNCTION FOR COUNT EMPLOYEES
+CREATE FUNCTION employee_count()
+RETURNS INT
+LANGUAGE SQL
+AS
+$$
+	SELECT COUNT(*) FROM employees
+$$
+
+-- call function
+SELECT employee_count();
+
+
+
+
+-- CREATE A FUNCTION FOR DELETE USER
+CREATE FUNCTION delete_users(emp_id INT) 
+RETURNS VOID
+LANGUAGE SQL
+AS 
+$$
+	DELETE FROM employees
+	WHERE id = emp_id
+$$
+
+-- call function
+SELECT delete_users(50);
+
+-- CHECK EMPLOYEE IS REMOVE OR NOT
+SELECT * FROM employees
+
+
+
+
+
+
 
 
 

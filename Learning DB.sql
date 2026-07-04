@@ -277,5 +277,33 @@ SELECT * FROM employees
 
 
 
+-- --------- Procedure in sql --------------------------------------
+
+CREATE PROCEDURE delete_emp_byId(emp_id INT)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+	DELETE FROM employees
+	WHERE id = emp_id;
+END;
+$$
+
+-- Call Procedure
+CALL delete_emp_byId(49);
 
 
+
+-- 10% salary increament by dept
+CREATE PROCEDURE salary_increament(emp_dept VARCHAR(50))
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+	UPDATE employees
+	SET salary = salary * 1.10;
+END;
+$$
+
+-- Call Procedure
+CALL salary_increament('IT');

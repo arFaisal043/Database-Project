@@ -307,3 +307,68 @@ $$
 
 -- Call Procedure
 CALL salary_increament('IT');
+
+
+
+
+
+
+
+
+-- --------- Trigger in sql --------------------------------------
+
+DROP TABLE IF EXISTS employees_logs;
+
+-- Create a Log Table for store all logs when an user is deleted
+CREATE TABLE employees_logs(
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    emp_name VARCHAR(100),
+    action VARCHAR(25),
+    action_time TIMESTAMP DEFAULT NOW()
+);
+
+
+-- CREATE A FUNCTION FOR DELETE USER LOGS AND INSERT LOGS INTO employees_logs TABLE
+CREATE FUNCTION logs_emp_deletion()
+RETURNS TRIGGER
+LANGUAGE plpgsql  
+AS 
+$$
+BEGIN
+	INSERT INTO employees_logs(emp_name, action) 
+	VALUES (OLD.name, 'User is deleted');
+	RETURN OLD;
+END;
+$$;
+
+
+-- Create a Trigger. This will triggered when delete function invoked
+CREATE TRIGGER save_employee_delete_logs
+AFTER DELETE
+ON employees
+FOR EACH ROW
+EXECUTE FUNCTION logs_emp_deletion()
+
+
+-- DELETE AN USER TO CHECK USER ARE ADD ON employees_logs TABLES OR NOT
+
+-- CREATE A FUNCTION FOR DELETE USER
+CREATE FUNCTION delete_users(emp_id INT) 
+RETURNS VOID
+LANGUAGE plpgsql 
+AS 
+$$
+BEGIN
+    DELETE FROM employees
+    WHERE id = emp_id;  
+END;
+$$;
+
+-- call function
+SELECT delete_users(46);
+
+
+
+SELECT * FROM employees
+SELECT * FROM employees_logs
+

@@ -236,7 +236,6 @@ where dept = 'HR' and salary = (
 
 
 
-
 -- --------- Function in sql --------------------------------------
 
 
@@ -371,4 +370,3 @@ SELECT delete_users(46);
 
 SELECT * FROM employees
 SELECT * FROM employees_logs
-

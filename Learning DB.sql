@@ -370,3 +370,105 @@ SELECT delete_users(46);
 
 SELECT * FROM employees
 SELECT * FROM employees_logs
+
+
+
+
+
+
+-- __________ ANALYZE QUERY EXECUTION TIME _________________________________
+
+EXPLAIN ANALYZE 
+SELECT * FROM users WHERE name = 'Eva Martinez';
+
+
+
+
+
+
+-- __________ Indexing _________________________________
+
+
+-- Create Users Table
+CREATE TABLE users_table (
+    user_id SERIAL PRIMARY KEY,
+    username VARCHAR(50),
+    email VARCHAR(100),
+    country VARCHAR(50),
+    created_at TIMESTAMP
+);
+
+-- Create Orders Table (This will be our massive table)
+CREATE TABLE order_table (
+    order_id SERIAL PRIMARY KEY,
+    user_id INT,
+    order_date TIMESTAMP,
+    status VARCHAR(20),
+    total_amount DECIMAL(10, 2),
+    shipping_mode VARCHAR(20)
+);
+
+
+-- 1. Insert 50,000 Users
+INSERT INTO users_table (username, email, country, created_at)
+SELECT 
+    'user_' || seq AS username,
+    'user_' || seq || '@example.com' AS email,
+    (ARRAY['USA', 'UK', 'Canada', 'Germany', 'Australia', 'India', 'Japan'])[FLOOR(RANDOM() * 7 + 1)] AS country,
+    NOW() - (RANDOM() * INTERVAL '365 days') AS created_at
+FROM generate_series(1, 50000) AS seq;
+
+-- 2. Insert 1,500,00 Orders (Linked randomly to those users)
+INSERT INTO order_table (user_id, order_date, status, total_amount, shipping_mode)
+SELECT 
+    FLOOR(RANDOM() * 49999 + 1)::INT AS user_id,
+    NOW() - (RANDOM() * INTERVAL '730 days') AS order_date,
+    (ARRAY['Pending', 'Shipped', 'Delivered', 'Cancelled'])[FLOOR(RANDOM() * 4 + 1)] AS status,
+    ROUND((RANDOM() * 500 + 5)::NUMERIC, 2) AS total_amount,
+    (ARRAY['Standard', 'Express', 'NextDay'])[FLOOR(RANDOM() * 3 + 1)] AS shipping_mode
+FROM generate_series(1, 1500000) AS seq;
+
+
+
+SELECT * FROM users_table; 
+SELECT * FROM order_table;
+
+-- ANALYZE QUERY EXECUTION TIME
+
+EXPLAIN ANALYZE SELECT * FROM users_table; 
+-- 6.785 ms
+EXPLAIN ANALYZE SELECT * FROM order_table;
+-- 156.945 ms
+
+
+-- BEFORE INDEXING
+-- EXAMPLE 1:
+EXPLAIN ANALYZE SELECT * FROM users_table WHERE email = 'user_42500@example.com';
+-- 6.445
+
+-- EXAMPLE 2:
+EXPLAIN ANALYZE 
+SELECT * FROM order_table 
+WHERE status = 'Shipped' 
+  AND order_date > NOW() - INTERVAL '30 days';
+-- 294.071 ms
+  
+
+-- CREATE INDEX
+CREATE INDEX idx_users_email ON users_table(email);
+
+CREATE INDEX idx_orders_status_date ON order_table(status, order_date);
+
+
+-- AFTER INDEXING
+
+-- EXAMPLE 1:
+EXPLAIN ANALYZE SELECT * FROM users_table WHERE email = 'user_42500@example.com';
+-- 6.445(before) --> 0.177 ms(after)
+
+-- EXAMPLE 2:
+EXPLAIN ANALYZE 
+SELECT * FROM order_table 
+WHERE status = 'Shipped' 
+  AND order_date > NOW() - INTERVAL '30 days';
+-- 294.071 ms(before) --> 33.811 ms (after)
